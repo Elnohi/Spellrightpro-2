@@ -1,167 +1,97 @@
-import { loginUser, signUpUser, logoutUser, setupAuthStateListener } from './auth.js';
-import { 
-  startPractice, 
-  startTest,
-  addCustomWords,
-  saveWordList,
-  loadWordList,
-  clearWordList,
-  handleFileUpload,
-  initWordManager
-} from './word-manager.js';
-import { trackEvent, trackError } from './analytics.js';
-import { speak, setAccent, getVoices } from './speech.js';
-import { showNotification } from './notification.js';
+// Debug function to log to console and screen
+function debugLog(message) {
+  console.log(message);
+  const debugConsole = document.getElementById('debug-console');
+  if (debugConsole) {
+    debugConsole.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${message}</div>`;
+    debugConsole.scrollTop = debugConsole.scrollHeight;
+  }
+}
 
-// Initialize OET words if available
-if (typeof OET_WORD_LIST !== 'undefined') {
-  initWordManager(OET_WORD_LIST);
+// Simple notification system
+function showNotification(message, type = "info") {
+  debugLog(`Notification: ${type} - ${message}`);
+  const note = document.createElement("div");
+  note.className = `notification ${type}`;
+  note.innerHTML = `<i class="fas fa-${type === 'error' ? 'exclamation-circle' : type === 'success' ? 'check-circle' : 'info-circle'}"></i> ${message}`;
+  document.body.appendChild(note);
+  setTimeout(() => note.remove(), 3000);
 }
 
 // Initialize the application
 function initializeApp() {
-  // Set up auth state listener
-  setupAuthStateListener();
-  
-  // Initialize event listeners
-  setupEventListeners();
-  
-  // Check for dark mode preference
-  checkDarkMode();
-  
-  // Load speech synthesis voices
-  loadVoices();
-  
-  console.log('App initialized successfully');
-}
+  debugLog("Initializing application...");
 
-// Set up event listeners
-function setupEventListeners() {
-  // Auth buttons
-  document.getElementById('loginBtn').addEventListener('click', handleLogin);
-  document.getElementById('signupBtn').addEventListener('click', handleSignup);
-  document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-  
-  // Practice buttons
-  document.getElementById('startPracticeBtn').addEventListener('click', handleStartPractice);
-  document.getElementById('startTestBtn').addEventListener('click', handleStartTest);
-  
-  // Word management buttons
-  document.getElementById('addCustomWordsBtn').addEventListener('click', handleAddCustomWords);
-  document.getElementById('saveWordListBtn').addEventListener('click', handleSaveWordList);
-  document.getElementById('loadWordListBtn').addEventListener('click', handleLoadWordList);
-  document.getElementById('clearWordListBtn').addEventListener('click', handleClearWordList);
-  
-  // File upload
-  document.getElementById('fileInput').addEventListener('change', handleFileUpload);
-  
-  // Exam select change
-  document.getElementById("examSelect").addEventListener("change", function() {
-    trackEvent('exam_selected', { exam_type: this.value });
-  });
-  
-  // Accent select change
-  document.getElementById("accentSelect").addEventListener("change", function() {
-    setAccent(this.value);
-    trackEvent('accent_changed', { accent: this.value });
-  });
-  
-  // Dark mode toggle
-  document.getElementById("modeToggle").addEventListener("click", toggleDarkMode);
-  
-  // Keyboard navigation
-  document.addEventListener('keydown', handleKeyboardNavigation);
-  
-  // Feedback form submission
-  const feedbackForm = document.querySelector('form[data-netlify="true"]');
-  if (feedbackForm) {
-    feedbackForm.addEventListener('submit', handleFeedbackSubmit);
+  // Setup all button event listeners
+  function setupButtonListeners() {
+    debugLog("Setting up button listeners...");
+    
+    // Auth buttons
+    document.getElementById('loginBtn')?.addEventListener('click', () => {
+      debugLog("Login button clicked");
+      showNotification("Login button works!", "success");
+    });
+    
+    document.getElementById('signupBtn')?.addEventListener('click', () => {
+      debugLog("Signup button clicked");
+      showNotification("Signup button works!", "success");
+    });
+    
+    document.getElementById('logoutBtn')?.addEventListener('click', () => {
+      debugLog("Logout button clicked");
+      showNotification("Logout button works!", "success");
+    });
+
+    // Practice buttons
+    document.getElementById('startPracticeBtn')?.addEventListener('click', () => {
+      debugLog("Practice button clicked");
+      showNotification("Practice button works!", "success");
+    });
+    
+    document.getElementById('startTestBtn')?.addEventListener('click', () => {
+      debugLog("Test button clicked");
+      showNotification("Test button works!", "success");
+    });
+
+    // Word management buttons
+    document.getElementById('addCustomWordsBtn')?.addEventListener('click', () => {
+      debugLog("Add Custom Words clicked");
+      showNotification("Custom Words button works!", "success");
+    });
+    
+    document.getElementById('saveWordListBtn')?.addEventListener('click', () => {
+      debugLog("Save Words clicked");
+      showNotification("Save Words button works!", "success");
+    });
+    
+    document.getElementById('loadWordListBtn')?.addEventListener('click', () => {
+      debugLog("Load Words clicked");
+      showNotification("Load Words button works!", "success");
+    });
+    
+    document.getElementById('clearWordListBtn')?.addEventListener('click', () => {
+      debugLog("Clear Words clicked");
+      showNotification("Clear Words button works!", "success");
+    });
+
+    // Dark mode toggle
+    document.getElementById('modeToggle')?.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      const icon = document.getElementById('modeIcon');
+      if (icon) {
+        icon.className = document.body.classList.contains('dark-mode') ? 'fas fa-sun' : 'fas fa-moon';
+      }
+      showNotification("Dark mode toggled", "info");
+    });
+  }
+
+  // Check if DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupButtonListeners);
+  } else {
+    setupButtonListeners();
   }
 }
 
-// Button handler functions
-async function handleLogin() {
-  try {
-    await loginUser();
-  } catch (error) {
-    trackError(error);
-    showNotification(error.message, "error");
-  }
-}
-
-async function handleSignup() {
-  try {
-    await signUpUser();
-  } catch (error) {
-    trackError(error);
-    showNotification(error.message, "error");
-  }
-}
-
-async function handleLogout() {
-  try {
-    await logoutUser();
-  } catch (error) {
-    trackError(error);
-    showNotification(error.message, "error");
-  }
-}
-
-function handleStartPractice() {
-  try {
-    startPractice();
-  } catch (error) {
-    trackError(error);
-    showNotification(error.message, "error");
-  }
-}
-
-function handleStartTest() {
-  try {
-    startTest();
-  } catch (error) {
-    trackError(error);
-    showNotification(error.message, "error");
-  }
-}
-
-function handleAddCustomWords() {
-  try {
-    addCustomWords();
-  } catch (error) {
-    trackError(error);
-    showNotification(error.message, "error");
-  }
-}
-
-async function handleSaveWordList() {
-  try {
-    await saveWordList();
-  } catch (error) {
-    trackError(error);
-    showNotification(error.message, "error");
-  }
-}
-
-async function handleLoadWordList() {
-  try {
-    await loadWordList();
-  } catch (error) {
-    trackError(error);
-    showNotification(error.message, "error");
-  }
-}
-
-function handleClearWordList() {
-  try {
-    clearWordList();
-  } catch (error) {
-    trackError(error);
-    showNotification(error.message, "error");
-  }
-}
-
-// ... rest of the existing app.js code (dark mode, keyboard nav, etc.) ...
-
-// Initialize the app when DOM is loaded
-document.addEventListener('DOMContentLoaded', initializeApp);
+// Start the app
+initializeApp();
