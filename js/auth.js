@@ -70,25 +70,21 @@ export async function logoutUser() {
 }
 
 export function setupAuthStateListener() {
-  auth.onAuthStateChanged(user => {
-    const loginStatus = document.getElementById("loginStatus");
-    
-    if (user) {
-      trackEvent('screen_view', {
-        screen_name: 'Main',
-        screen_class: 'Home'
-      });
-      trackEvent('login_success');
-      
-      document.getElementById("formHiddenEmail").value = user.email;
-      loginStatus.textContent = `Logged in as ${user.email}`;
-      loginStatus.style.color = "green";
-    } else {
-      loginStatus.textContent = "Not logged in";
-      loginStatus.style.color = "red";
-    }
-      window.loginUser = loginUser;
-      window.signUpUser = signUpUser;
-      window.logoutUser = logoutUser; 
-    }
-  });
+auth.onAuthStateChanged(user => {
+  const loginStatus = document.getElementById("loginStatus");
+
+  if (user) {
+    trackEvent('screen_view', {
+      screen_name: 'Main',
+      screen_class: 'Home'
+    });
+    trackEvent('login_success');
+
+    document.getElementById("formHiddenEmail").value = user.email;
+    loginStatus.textContent = `Logged in as ${user.email}`;
+    loginStatus.style.color = "green";
+  } else {
+    loginStatus.textContent = "Not logged in";
+    loginStatus.style.color = "red";
+  }
+});
