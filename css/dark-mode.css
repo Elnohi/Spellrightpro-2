@@ -1,1 +1,28 @@
+.dark-mode { 
+  background: #121212; 
+  color: #fff; 
+}
 
+.dark-mode .word-box { 
+  background: #1e1e1e; 
+  border-color: #444; 
+  color: #fff;
+}
+
+.dark-mode input,
+.dark-mode select,
+.dark-mode textarea {
+  background: #333;
+  color: #fff;
+  border-color: #555;
+}
+
+.dark-mode .loading-content {
+  background: #333;
+  color: white;
+}
+
+.dark-mode .btn:disabled {
+  background: #555;
+  color: #999;
+}
