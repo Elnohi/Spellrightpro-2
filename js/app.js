@@ -1,130 +1,77 @@
-// Initialize debug mode
-const DEBUG_MODE = true;
-
-// Debug logging function
-function debugLog(message) {
-  if (DEBUG_MODE) {
-    console.log(message);
-    const debugConsole = document.getElementById('debug-console');
-    if (debugConsole) {
-      debugConsole.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${message}</div>`;
-      debugConsole.scrollTop = debugConsole.scrollHeight;
-    }
+class SpellRightApp {
+  constructor() {
+    this.initElements();
+    this.initEventListeners();
+    this.checkDarkMode();
+    this.updateLoginStatus();
   }
-}
 
-// Notification system
-function showNotification(message, type = "info") {
-  debugLog(`Notification: ${type} - ${message}`);
-  
-  const notification = document.createElement('div');
-  notification.className = `notification notification-${type}`;
-  notification.innerHTML = `
-    <i class="fas fa-${
-      type === 'error' ? 'exclamation-circle' : 
-      type === 'success' ? 'check-circle' : 
-      'info-circle'
-    }"></i>
-    <span>${message}</span>
-  `;
-  
-  document.body.appendChild(notification);
-  
-  setTimeout(() => {
-    notification.classList.add('show');
-  }, 10);
-  
-  setTimeout(() => {
-    notification.classList.remove('show');
-    setTimeout(() => notification.remove(), 300);
-  }, 5000);
-}
+  initElements() {
+    // Auth elements
+    this.emailInput = document.getElementById('userEmail');
+    this.passwordInput = document.getElementById('userPassword');
+    this.loginBtn = document.getElementById('loginBtn');
+    this.signupBtn = document.getElementById('signupBtn');
+    this.logoutBtn = document.getElementById('logoutBtn');
+    this.loginStatus = document.getElementById('loginStatus');
 
-// Button handler with error protection
-function setupButton(buttonId, handler) {
-  const button = document.getElementById(buttonId);
-  if (!button) {
-    debugLog(`Button ${buttonId} not found`);
-    return;
+    // Practice elements
+    this.wordDisplay = document.getElementById('wordDisplay');
+    this.repeatBtn = document.getElementById('repeatBtn');
+    this.correctBtn = document.getElementById('correctBtn');
+    this.incorrectBtn = document.getElementById('incorrectBtn');
+    this.progressBar = document.getElementById('progressBar');
+
+    // Other UI elements
+    this.modeToggle = document.getElementById('modeToggle');
+    this.notificationArea = document.getElementById('notificationArea');
   }
-  
-  button.addEventListener('click', () => {
+
+  initEventListeners() {
+    // Auth events
+    this.loginBtn.addEventListener('click', () => this.handleLogin());
+    this.signupBtn.addEventListener('click', () => this.handleSignup());
+    this.logoutBtn.addEventListener('click', () => this.handleLogout());
+
+    // Practice events
+    this.repeatBtn.addEventListener('click', () => this.repeatWord());
+    this.correctBtn.addEventListener('click', () => this.answer(true));
+    this.incorrectBtn.addEventListener('click', () => this.answer(false));
+
+    // Dark mode toggle
+    this.modeToggle.addEventListener('click', () => this.toggleDarkMode());
+  }
+
+  async handleLogin() {
     try {
-      debugLog(`${buttonId} clicked`);
-      handler();
+      const email = this.emailInput.value;
+      const password = this.passwordInput.value;
+      await loginUser(email, password);
+      this.showNotification('Logged in successfully', 'success');
+      this.updateLoginStatus();
     } catch (error) {
-      debugLog(`Error in ${buttonId}: ${error.message}`);
-      showNotification(`Error: ${error.message}`, "error");
+      this.showNotification(error.message, 'error');
     }
-  });
-}
-
-// Practice functions
-function startPracticeSession() {
-  debugLog("Starting practice session");
-  const trainer = document.getElementById('trainer');
-  trainer.innerHTML = `
-    <h2>Practice Session</h2>
-    <div class="word-display">
-      <p class="current-word">Sample word will appear here</p>
-      <div class="controls">
-        <button class="btn btn-success">Correct</button>
-        <button class="btn btn-warning">Incorrect</button>
-      </div>
-    </div>
-  `;
-  showNotification("Practice session started", "success");
-}
-
-function startTestSession() {
-  debugLog("Starting test session");
-  document.getElementById('trainer').innerHTML = `
-    <h2>Test Mode</h2>
-    <div class="test-interface">
-      <p>Test words will appear here</p>
-    </div>
-  `;
-  showNotification("Test session started", "success");
-}
-
-// Initialize all functionality
-function initializeApp() {
-  debugLog("Initializing application");
-  
-  // Setup buttons
-  setupButton('startPracticeBtn', startPracticeSession);
-  setupButton('startTestBtn', startTestSession);
-  
-  setupButton('addCustomWordsBtn', () => {
-    const words = document.getElementById('wordInput').value;
-    debugLog(`Adding custom words: ${words}`);
-    showNotification("Custom words added", "success");
-  });
-  
-  // Setup other buttons similarly...
-  
-  // Dark mode toggle
-  setupButton('modeToggle', () => {
-    document.body.classList.toggle('dark-mode');
-    const icon = document.getElementById('modeIcon');
-    if (icon) {
-      icon.className = document.body.classList.contains('dark-mode') ? 
-        'fas fa-sun' : 'fas fa-moon';
-    }
-    showNotification("Dark mode toggled", "info");
-  });
-  
-  // Show debug console if in debug mode
-  if (DEBUG_MODE) {
-    document.getElementById('debug-console').style.display = 'block';
   }
-  
-  debugLog("Application initialized");
+
+  // ... other methods ...
+
+  showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+      <i class="fas fa-${type === 'error' ? 'exclamation-circle' : 
+                       type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+      ${message}
+    `;
+    this.notificationArea.appendChild(notification);
+    setTimeout(() => notification.remove(), 5000);
+  }
+
+  // ... remaining methods ...
 }
 
-// Start the app when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeApp);
-} else {
-  initializeApp();
-}
+// Initialize the app
+document.addEventListener('DOMContentLoaded', () => {
+  window.app = new SpellRightApp();
+});
