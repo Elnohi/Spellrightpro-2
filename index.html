@@ -12,15 +12,13 @@
   <div class="container">
     <header class="app-header">
       <img src="assets/logo.png" alt="Logo" class="app-logo">
-      <h1 class="app-title">SpellRightPro</h1>
+      <h1>SpellRightPro</h1>
     </header>
 
     <section class="auth-section">
       <div class="form-row">
-        <label>Email:</label>
-        <input type="email" id="userEmail" placeholder="Enter email">
-        <label>Password:</label>
-        <input type="password" id="userPassword" placeholder="Enter password">
+        <input type="email" id="userEmail" placeholder="Email">
+        <input type="password" id="userPassword" placeholder="Password">
         <button id="loginBtn" class="btn">Login</button>
         <button id="signupBtn" class="btn btn-info">Sign Up</button>
         <button id="logoutBtn" class="btn btn-warning">Logout</button>
@@ -28,55 +26,51 @@
       </div>
     </section>
 
-    <section class="settings-section">
+    <section class="practice-section">
       <div class="form-row">
-        <label>Select Exam:</label>
-        <select id="examSelect">
-          <option value="">-- Choose --</option>
-          <option value="OET">OET</option>
-        </select>
-        <label>Accent:</label>
         <select id="accentSelect">
-          <option value="en-GB">British</option>
-          <option value="en-US">American</option>
+          <option value="en-GB">British English</option>
+          <option value="en-US">American English</option>
         </select>
-        <button id="modeToggle" class="btn"><i id="modeIcon" class="fas fa-moon"></i></button>
-      </div>
-    </section>
-
-    <section class="actions-section">
-      <div class="button-group">
         <button id="startPracticeBtn" class="btn btn-info">Start Practice</button>
         <button id="startTestBtn" class="btn btn-success">Start Test</button>
+        <button id="modeToggle" class="btn"><i id="modeIcon" class="fas fa-moon"></i></button>
       </div>
     </section>
 
     <section class="word-management">
       <div class="form-row">
-        <label>Upload Word File:</label>
-        <input type="file" id="fileInput">
+        <textarea id="wordInput" placeholder="Enter words (one per line)"></textarea>
+        <button id="addWordsBtn" class="btn">Add Words</button>
       </div>
       <div class="form-row">
-        <textarea id="wordInput" rows="3" placeholder="Enter custom words here..."></textarea>
-        <button id="addCustomWordsBtn" class="btn">Add Custom Words</button>
-      </div>
-      <div class="button-group">
-        <button id="saveWordListBtn" class="btn btn-info">Save Words</button>
-        <button id="loadWordListBtn" class="btn btn-success">Load Words</button>
-        <button id="clearWordListBtn" class="btn btn-warning">Clear Words</button>
+        <input type="file" id="wordFileInput" accept=".json,.txt">
+        <button id="saveWordsBtn" class="btn btn-info">Save List</button>
+        <button id="loadWordsBtn" class="btn btn-success">Load List</button>
       </div>
     </section>
 
-    <main class="content-area">
-      <div id="trainer" class="card trainer-card"></div>
-      <div id="scoreDisplay" class="card stats-card"></div>
+    <main class="practice-area">
+      <div id="wordDisplay" class="word-display">
+        <p>Ready to practice!</p>
+      </div>
+      <div class="practice-controls">
+        <button id="repeatBtn" class="btn"><i class="fas fa-redo"></i> Repeat</button>
+        <button id="correctBtn" class="btn btn-success">Correct</button>
+        <button id="incorrectBtn" class="btn btn-warning">Incorrect</button>
+      </div>
+      <div id="progressContainer" class="progress-container">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
     </main>
 
-    <div id="debug-console" class="debug-console"></div>
+    <div id="notificationArea"></div>
   </div>
 
   <script src="js/firebase-config.js"></script>
   <script src="js/oet_word_list.js"></script>
+  <script src="js/speech.js"></script>
+  <script src="js/word-manager.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/app.js"></script>
 </body>
