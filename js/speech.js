@@ -1,40 +1,36 @@
-const synth = window.speechSynthesis;
-let currentAccent = "en-GB";
+class SpeechService {
+  constructor() {
+    this.synth = window.speechSynthesis;
+    this.voices = [];
+    this.currentVoice = null;
+    this.loadVoices();
+  }
 
-export function setAccent(accent) {
-  currentAccent = accent;
-}
-
-export function speak(text, rate = 0.9) {
-  synth.cancel();
-  
-  return new Promise((resolve) => {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = currentAccent;
-    utterance.rate = rate;
-    utterance.volume = 1;
-    
-    utterance.onend = resolve;
-    
-    const voices = synth.getVoices();
-    const accentVoice = voices.find(voice => voice.lang === currentAccent) || voices[0];
-    if (accentVoice) {
-      utterance.voice = accentVoice;
-    }
-    
-    synth.speak(utterance);
-  });
-}
-
-export function getVoices() {
-  return new Promise((resolve) => {
-    const voices = synth.getVoices();
-    if (voices.length) {
-      resolve(voices);
-    } else {
-      synth.onvoiceschanged = () => {
-        resolve(synth.getVoices());
+  loadVoices() {
+    this.voices = this.synth.getVoices();
+    if (this.synth.onvoiceschanged !== undefined) {
+      this.synth.onvoiceschanged = () => {
+        this.voices = this.synth.getVoices();
       };
     }
-  });
+  }
+
+  speak(text, lang = 'en-GB') {
+    return new Promise((resolve) => {
+      this.synth.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = lang;
+      utterance.rate = 0.9;
+      
+      // Find appropriate voice
+      const voice = this.voices.find(v => v.lang === lang) || this.voices[0];
+      if (voice) utterance.voice = voice;
+      
+      utterance.onend = resolve;
+      this.synth.speak(utterance);
+    });
+  }
 }
+
+window.speechService = new SpeechService();
