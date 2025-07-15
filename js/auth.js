@@ -88,3 +88,4 @@ auth.onAuthStateChanged(user => {
     loginStatus.style.color = "red";
   }
 });
+}
