@@ -1,11 +1,15 @@
-/spellrightpro
-  /css
-    styles.css
-    dark-mode.css
-  /js
-    app.js
-    auth.js
-    word-manager.js
-    analytics.js
-    speech.js
-  index.html
+spellrightpro/
+├── index.html
+├── css/
+│   ├── styles.css
+│   └── dark-mode.css
+├── js/
+│   ├── app.js
+│   ├── auth.js
+│   ├── word-manager.js
+│   ├── analytics.js
+│   ├── speech.js
+│   ├── firebase-config.js
+│   └── oet_word_list.js
+└── assets/
+    └── logo.png
