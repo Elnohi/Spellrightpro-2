@@ -1,36 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SpellRightPro</title>
-
+  
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-analytics-compat.js"></script>
-
-  <!-- Firebase Config -->
-  <script src="js/firebase-config.js"></script>
-
+  
   <!-- FontAwesome -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
   <!-- Styles -->
-  <link href="css/styles.css" rel="stylesheet">
-  <link href="css/dark-mode.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/dark-mode.css">
 </head>
 <body>
   <div class="container">
-    <img src="assets/logo.png" alt="SpellRightPro Logo" style="height:50px; vertical-align:middle; margin-right:10px;" />
-    <h1 style="display:inline-block; vertical-align:middle;">SpellRightPro</h1>
+    <img src="assets/logo.png" alt="SpellRightPro Logo" class="logo">
+    <h1>SpellRightPro</h1>
 
     <div class="form-row" id="authSection">
       <label>Email:</label>
-      <input type="email" id="userEmail" placeholder="Enter email" />
+      <input type="email" id="userEmail" placeholder="Enter email">
       <label>Password:</label>
-      <input type="password" id="userPassword" placeholder="Enter password" />
+      <input type="password" id="userPassword" placeholder="Enter password">
       <button id="loginBtn" class="btn">Login</button>
       <button id="signupBtn" class="btn btn-info">Sign Up</button>
       <button id="logoutBtn" class="btn btn-warning">Logout</button>
@@ -58,7 +55,7 @@
 
     <div class="form-row">
       <label>Upload Word File:</label>
-      <input type="file" id="fileInput" />
+      <input type="file" id="fileInput">
     </div>
 
     <div class="form-row">
@@ -80,28 +77,13 @@
       </div>
     </div>
 
-    <!-- Netlify Form -->
-    <form name="feedback" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="form-row">
-      <input type="hidden" name="form-name" value="feedback" />
-      <input type="hidden" name="user-email" id="formHiddenEmail" />
-      <p hidden>
-        <label>Don't fill this out: <input name="bot-field" /></label>
-      </p>
-      <textarea name="message" rows="3" placeholder="Write your notes or comments here..." style="width:100%;" required></textarea>
-      <button type="submit" class="btn btn-success" id="submitBtn">
-        <i class="fas fa-paper-plane"></i> Send Comment
-      </button>
-    </form>
+    <!-- Debug console (remove in production) -->
+    <div id="debug-console" style="position:fixed;bottom:0;left:0;background:white;padding:10px;border:1px solid #ccc;z-index:1000;max-height:200px;overflow:auto;"></div>
   </div>
 
-  <!-- OET Word List -->
+  <!-- Load scripts -->
+  <script src="js/firebase-config.js"></script>
   <script src="js/oet_word_list.js"></script>
-
-  <!-- External Libraries -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.0/mammoth.browser.min.js"></script>
-
-  <!-- Application Scripts (loaded as modules) -->
   <script src="js/app.js" type="module"></script>
 </body>
 </html>
