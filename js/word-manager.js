@@ -84,3 +84,8 @@ function saveProgress() {
 }
 
 // ... (remaining word management functions)
+window.addCustomWords = addCustomWords;
+window.saveWordList = saveWordList;
+window.loadWordList = loadWordList;
+window.clearWordList = clearWordList;
+
