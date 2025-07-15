@@ -277,7 +277,3 @@ window.onerror = function(message, source, lineno, colno, error) {
 
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', initializeApp);
-
-window.startPractice = startPractice;
-window.startTest = startTest;
-
