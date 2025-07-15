@@ -1,1 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#007bff">
+  <meta name="description" content="SpellRightPro - Spelling practice tool for medical professionals">
+  <title>SpellRightPro</title>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-analytics-compat.js"></script>
+
+  <!-- FontAwesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+
+  <!-- Styles -->
+  <link href="css/styles.css" rel="stylesheet"/>
+  <link href="css/dark-mode.css" rel="stylesheet"/>
+
+  <!-- Preload scripts -->
+  <link rel="preload" href="js/firebase-config.js" as="script">
+  <link rel="preload" href="js/app.js" as="script">
+</head>
+<body>
+  <div class="container">
+    <img src="assets/logo.png" alt="SpellRightPro Logo" style="height:50px; vertical-align:middle; margin-right:10px;" />
+    <h1 style="display:inline-block; vertical-align:middle;">SpellRightPro</h1>
+
+    <div class="form-row" id="authSection">
+      <label for="userEmail">Email:</label>
+      <input type="email" id="userEmail" placeholder="Enter email" aria-required="true"/>
+      <label for="userPassword">Password:</label>
+      <input type="password" id="userPassword" placeholder="Enter password" aria-required="true"/>
+      <button onclick="loginUser()" class="btn" aria-label="Login">Login</button>
+      <button onclick="signUpUser()" class="btn btn-info" aria-label="Sign up">Sign Up</button>
+      <button onclick="logoutUser()" class="btn btn-warning" aria-label="Logout">Logout</button>
+      <span id="loginStatus" role="status" aria-live="polite"></span>
+    </div>
+
+    <div class="form-row">
+      <label for="examSelect">Select Exam:</label>
+      <select id="examSelect" aria-label="Select exam type">
+        <option value="">-- Choose --</option>
+        <option value="OET">OET</option>
+      </select>
+      <label for="accentSelect">Accent:</label>
+      <select id="accentSelect" aria-label="Select pronunciation accent">
+        <option value="en-GB">British</option>
+        <option value="en-US">American</option>
+      </select>
+      <button id="modeToggle" class="btn" aria-label="Toggle dark mode"><i id="modeIcon" class="fas fa-moon"></i></button>
+    </div>
+
+    <div class="form-row">
+      <button onclick="startPractice()" class="btn btn-info" aria-label="Start practice session">Start Practice</button>
+      <button onclick="startTest()" class="btn btn-success" aria-label="Start test session">Start Test</button>
+    </div>
+
+    <div class="form-row">
+      <label for="fileInput">Upload Word File:</label>
+      <input type="file" id="fileInput" onchange="handleFileUpload(event)" aria-label="Upload word file" accept=".txt,.pdf,.docx"/>
+    </div>
+
+    <div class="form-row">
+      <textarea id="wordInput" rows="3" placeholder="Enter custom words here..." aria-label="Custom word input"></textarea>
+      <button type="button" onclick="addCustomWords()" class="btn" aria-label="Add custom words">Add Custom Words</button>
+    </div>
+
+    <div class="form-row">
+      <button onclick="saveWordList()" class="btn btn-info" aria-label="Save word list">Save Words</button>
+      <button onclick="loadWordList()" class="btn btn-success" aria-label="Load word list">Load Words</button>
+      <button onclick="clearWordList()" class="btn btn-warning" aria-label="Clear word list">Clear Words</button>
+    </div>
+
+    <div id="trainer" class="card" role="region" aria-live="polite"></div>
+    <div id="scoreDisplay" class="card" role="region" aria-live="polite"></div>
+    <div id="loadingIndicator" style="display:none;" aria-busy="true">
+      <div class="progress-container">
+        <div class="progress-bar"></div>
+      </div>
+    </div>
+
+    <!-- Netlify Form -->
+    <form name="feedback" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="form-row">
+      <input type="hidden" name="form-name" value="feedback" />
+      <input type="hidden" name="user-email" id="formHiddenEmail" />
+      <p hidden>
+        <label>Don't fill this out: <input name="bot-field" /></label>
+      </p>
+      <textarea name="message" rows="3" placeholder="Write your notes or comments here..." style="width:100%;" required aria-label="Feedback textarea"></textarea>
+      <button type="submit" class="btn btn-success" id="submitBtn" aria-label="Submit feedback">
+        <i class="fas fa-paper-plane"></i> Send Comment
+      </button>
+    </form>
+
+    <!-- Hidden Netlify Form for Fallback Submission -->
+    <form name="feedback" netlify netlify-honeypot="bot-field" hidden>
+      <input type="text" name="user-email" />
+      <textarea name="message"></textarea>
+    </form>
+  </div>
+
+  <!-- External Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.0/mammoth.browser.min.js"></script>
+
+  <!-- App Scripts -->
+  <script type="module" src="js/firebase-config.js"></script>
+  <script type="module" src="js/auth.js"></script>
+  <script type="module" src="js/word-manager.js"></script>
+  <script type="module" src="js/analytics.js"></script>
+  <script type="module" src="js/speech.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
