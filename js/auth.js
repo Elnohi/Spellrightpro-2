@@ -87,5 +87,8 @@ export function setupAuthStateListener() {
       loginStatus.textContent = "Not logged in";
       loginStatus.style.color = "red";
     }
+      window.loginUser = loginUser;
+      window.signUpUser = signUpUser;
+      window.logoutUser = logoutUser; 
+    }
   });
-}
