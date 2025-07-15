@@ -12,23 +12,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-analytics-compat.js"></script>
 
   <!-- Firebase Config -->
-  <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyCZ-rAPnRgVjSRFOFvbiQlowE6A3RVvwWo",
-    authDomain: "spellrightpro-firebase.firebaseapp.com",
-    projectId: "spellrightpro-firebase",
-    storageBucket: "spellrightpro-firebase.firebasestorage.app",
-    messagingSenderId: "798456641137",
-    appId: "1:798456641137:web:5c6d79db5bf49d04928dd0",
-    measurementId: "G-H09MF13297"
-  };
-    
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const analytics = firebase.analytics();
-  </script>
+  <script src="js/firebase-config.js"></script>
 
   <!-- FontAwesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
@@ -255,104 +239,28 @@
   </div>
 
   <!-- External Scripts -->
-  <script src="oet_word_list.js"></script>
+  <script src="js/oet_word_list.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.0/mammoth.browser.min.js"></script>
 
-  <!-- Fixed JavaScript -->
+  <!-- Application Scripts -->
+  <script src="js/auth.js"></script>
+  <script src="js/word-manager.js"></script>
+  <script src="js/speech.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/analytics.js"></script>
+
+  <!-- Fallback for undefined functions -->
   <script>
-    // Initialize Firebase
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const analytics = firebase.analytics();
-    const synth = window.speechSynthesis;
-
-    // Dark Mode Fix
-    document.getElementById('modeToggle').addEventListener('click', function() {
-      document.body.classList.toggle('dark-mode');
-      const dark = document.body.classList.contains('dark-mode');
-      document.getElementById('modeIcon').className = dark ? 'fas fa-sun' : 'fas fa-moon';
-      localStorage.setItem('darkMode', dark ? 'enabled' : 'disabled');
-    });
-
-    // Initialize dark mode
-    if (localStorage.getItem('darkMode') === 'enabled') {
-      document.body.classList.add('dark-mode');
-      document.getElementById('modeIcon').className = 'fas fa-sun';
-    }
-
-    // Auth State Listener Fix
-    auth.onAuthStateChanged(user => {
-      const loginStatus = document.getElementById('loginStatus');
-      if (user) {
-        loginStatus.textContent = `Logged in as ${user.email}`;
-        loginStatus.style.color = 'green';
-      } else {
-        loginStatus.textContent = 'Not logged in';
-        loginStatus.style.color = 'red';
+    document.querySelectorAll('button[onclick]').forEach(button => {
+      const funcName = button.getAttribute('onclick').replace('()', '');
+      if (typeof window[funcName] !== 'function') {
+        button.addEventListener('click', () => {
+          console.error(`Function ${funcName} is not implemented`);
+          alert(`Function ${funcName} is not implemented yet`);
+        });
       }
     });
-
-    // Login Fix
-    async function loginUser() {
-      const email = document.getElementById('userEmail').value.trim();
-      const password = document.getElementById('userPassword').value;
-      try {
-        await auth.signInWithEmailAndPassword(email, password);
-        showNotification('Login successful!', 'success');
-      } catch (error) {
-        showNotification(error.message, 'error');
-      }
-    }
-
-    // Word Loading Fix
-    let oetWords = [];
-    if (typeof OET_WORD_LIST !== 'undefined') {
-      oetWords = OET_WORD_LIST;
-    }
-
-    document.getElementById('examSelect').addEventListener('change', function() {
-      if (this.value === 'OET') {
-        showNotification(`Loaded ${oetWords.length} OET words`, 'success');
-      }
-    });
-
-    // Notification Function
-    function showNotification(message, type = "info") {
-      const note = document.createElement("div");
-      note.className = `notification ${type}`;
-      note.innerHTML = `
-        <i class="fas fa-${
-          type === 'error' ? 'exclamation-circle' : 
-          type === 'success' ? 'check-circle' : 
-          'info-circle'
-        }"></i> 
-        <span>${message}</span>
-      `;
-      document.body.appendChild(note);
-      setTimeout(() => note.classList.add("show"), 10);
-      setTimeout(() => {
-        note.classList.remove("show");
-        setTimeout(() => note.remove(), 300);
-      }, 5000);
-    }
-
-    // Initialize other functions (keep your original implementations)
-    function signUpUser() { /* ... */ }
-    function logoutUser() { /* ... */ }
-    function startPractice() { /* ... */ }
-    function startTest() { /* ... */ }
-    function handleFileUpload(event) { /* ... */ }
-    function addCustomWords() { /* ... */ }
-    function saveWordList() { /* ... */ }
-    function loadWordList() { /* ... */ }
-    function clearWordList() { /* ... */ }
   </script>
-  <!-- Add these script references -->
-<script src="js/auth.js"></script>
-<script src="js/word-manager.js"></script>
-<script src="js/speech.js"></script>
-<script src="js/app.js"></script>
-<script src="js/init.js"></script>
 </body>
 </html>
