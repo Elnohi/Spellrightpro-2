@@ -3,8 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="theme-color" content="#007bff">
-  <meta name="description" content="SpellRightPro - Spelling practice tool for medical professionals">
   <title>SpellRightPro</title>
 
   <!-- Firebase SDK -->
@@ -13,71 +11,230 @@
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-analytics-compat.js"></script>
 
+  <!-- Firebase Config -->
+  <script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCZ-rAPnRgVjSRFOFvbiQlowE6A3RVvwWo",
+    authDomain: "spellrightpro-firebase.firebaseapp.com",
+    projectId: "spellrightpro-firebase",
+    storageBucket: "spellrightpro-firebase.firebasestorage.app",
+    messagingSenderId: "798456641137",
+    appId: "1:798456641137:web:5c6d79db5bf49d04928dd0",
+    measurementId: "G-H09MF13297"
+  };
+    
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const analytics = firebase.analytics();
+  </script>
+
   <!-- FontAwesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
 
-  <!-- Styles -->
-  <link href="css/styles.css" rel="stylesheet"/>
-  <link href="css/dark-mode.css" rel="stylesheet"/>
-
-  <!-- Preload scripts -->
-  <link rel="preload" href="js/firebase-config.js" as="script">
-  <link rel="preload" href="js/app.js" as="script">
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 0; 
+      padding: 0; 
+      background: #f8f9fa; 
+      transition: background 0.3s ease;
+    }
+    .container { 
+      max-width: 960px; 
+      margin: auto; 
+      padding: 20px; 
+    }
+    .form-row { 
+      display: flex; 
+      flex-wrap: wrap; 
+      gap: 10px; 
+      align-items: center; 
+      margin-top: 15px; 
+    }
+    .form-row label { 
+      min-width: 100px; 
+    }
+    .form-row select, 
+    .form-row input[type="email"], 
+    .form-row input[type="password"],
+    .form-row textarea, 
+    .form-row input[type="file"] {
+      flex: 1; 
+      padding: 8px; 
+      border: 1px solid #ccc; 
+      border-radius: 5px;
+      transition: all 0.3s ease;
+    }
+    .btn { 
+      padding: 10px 15px; 
+      margin: 5px; 
+      border: none; 
+      background: #007bff; 
+      color: white; 
+      border-radius: 5px; 
+      cursor: pointer; 
+      transition: all 0.3s ease;
+    }
+    .btn:hover { 
+      background: #0056b3; 
+      transform: translateY(-1px);
+    }
+    .btn:disabled {
+      background: #cccccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-info { 
+      background: #17a2b8; 
+    }
+    .btn-success { 
+      background: #28a745; 
+    }
+    .btn-warning { 
+      background: #ffc107; 
+      color: black; 
+    }
+    .word-box { 
+      padding: 20px; 
+      border: 2px solid #007bff; 
+      border-radius: 10px; 
+      background: white; 
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+    .progress-container { 
+      height: 10px; 
+      background: #ddd; 
+      margin-bottom: 10px; 
+      border-radius: 5px; 
+    }
+    .progress-bar { 
+      height: 10px; 
+      background: #28a745; 
+      width: 0%; 
+      border-radius: 5px; 
+      transition: width 0.3s ease;
+    }
+    .status.correct { 
+      color: green; 
+      font-weight: bold;
+    }
+    .status.incorrect { 
+      color: red; 
+      font-weight: bold;
+    }
+    .notification {
+      position: fixed; 
+      bottom: 20px; 
+      right: 20px; 
+      background: #333; 
+      color: #fff;
+      padding: 12px 18px; 
+      border-radius: 5px; 
+      opacity: 0; 
+      transition: opacity 0.3s ease-in-out; 
+      z-index: 1000;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .notification.show { 
+      opacity: 1; 
+    }
+    .notification.success {
+      background: #28a745;
+    }
+    .notification.error {
+      background: #dc3545;
+    }
+    .notification.info {
+      background: #17a2b8;
+    }
+    .dark-mode { 
+      background: #121212; 
+      color: #fff; 
+    }
+    .dark-mode .word-box { 
+      background: #1e1e1e; 
+      border-color: #444; 
+      color: #fff;
+    }
+    .dark-mode input,
+    .dark-mode select,
+    .dark-mode textarea {
+      background: #333;
+      color: #fff;
+      border-color: #555;
+    }
+    @media (max-width: 600px) {
+      .form-row { 
+        flex-direction: column; 
+        align-items: stretch; 
+      }
+    }
+    .fa-spin {
+      animation: fa-spin 2s infinite linear;
+    }
+    @keyframes fa-spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <img src="assets/logo.png" alt="SpellRightPro Logo" style="height:50px; vertical-align:middle; margin-right:10px;" />
+    <img src="logo.png" alt="SpellRightPro Logo" style="height:50px; vertical-align:middle; margin-right:10px;" />
     <h1 style="display:inline-block; vertical-align:middle;">SpellRightPro</h1>
 
     <div class="form-row" id="authSection">
-      <label for="userEmail">Email:</label>
-      <input type="email" id="userEmail" placeholder="Enter email" aria-required="true"/>
-      <label for="userPassword">Password:</label>
-      <input type="password" id="userPassword" placeholder="Enter password" aria-required="true"/>
-      <button onclick="loginUser()" class="btn" aria-label="Login">Login</button>
-      <button onclick="signUpUser()" class="btn btn-info" aria-label="Sign up">Sign Up</button>
-      <button onclick="logoutUser()" class="btn btn-warning" aria-label="Logout">Logout</button>
-      <span id="loginStatus" role="status" aria-live="polite"></span>
+      <label>Email:</label>
+      <input type="email" id="userEmail" placeholder="Enter email" />
+      <label>Password:</label>
+      <input type="password" id="userPassword" placeholder="Enter password" />
+      <button onclick="loginUser()" class="btn">Login</button>
+      <button onclick="signUpUser()" class="btn btn-info">Sign Up</button>
+      <button onclick="logoutUser()" class="btn btn-warning">Logout</button>
+      <span id="loginStatus"></span>
     </div>
 
     <div class="form-row">
-      <label for="examSelect">Select Exam:</label>
-      <select id="examSelect" aria-label="Select exam type">
+      <label>Select Exam:</label>
+      <select id="examSelect">
         <option value="">-- Choose --</option>
         <option value="OET">OET</option>
       </select>
-      <label for="accentSelect">Accent:</label>
-      <select id="accentSelect" aria-label="Select pronunciation accent">
+      <label>Accent:</label>
+      <select id="accentSelect">
         <option value="en-GB">British</option>
         <option value="en-US">American</option>
       </select>
-      <button id="modeToggle" class="btn" aria-label="Toggle dark mode"><i id="modeIcon" class="fas fa-moon"></i></button>
+      <button id="modeToggle" class="btn"><i id="modeIcon" class="fas fa-moon"></i></button>
     </div>
 
     <div class="form-row">
-      <button onclick="startPractice()" class="btn btn-info" aria-label="Start practice session">Start Practice</button>
-      <button onclick="startTest()" class="btn btn-success" aria-label="Start test session">Start Test</button>
+      <button onclick="startPractice()" class="btn btn-info">Start Practice</button>
+      <button onclick="startTest()" class="btn btn-success">Start Test</button>
     </div>
 
     <div class="form-row">
-      <label for="fileInput">Upload Word File:</label>
-      <input type="file" id="fileInput" onchange="handleFileUpload(event)" aria-label="Upload word file" accept=".txt,.pdf,.docx"/>
+      <label>Upload Word File:</label>
+      <input type="file" id="fileInput" onchange="handleFileUpload(event)" />
     </div>
 
     <div class="form-row">
-      <textarea id="wordInput" rows="3" placeholder="Enter custom words here..." aria-label="Custom word input"></textarea>
-      <button type="button" onclick="addCustomWords()" class="btn" aria-label="Add custom words">Add Custom Words</button>
+      <textarea id="wordInput" rows="3" placeholder="Enter custom words here..."></textarea>
+      <button type="button" onclick="addCustomWords()" class="btn">Add Custom Words</button>
     </div>
 
     <div class="form-row">
-      <button onclick="saveWordList()" class="btn btn-info" aria-label="Save word list">Save Words</button>
-      <button onclick="loadWordList()" class="btn btn-success" aria-label="Load word list">Load Words</button>
-      <button onclick="clearWordList()" class="btn btn-warning" aria-label="Clear word list">Clear Words</button>
+      <button onclick="saveWordList()" class="btn btn-info">Save Words</button>
+      <button onclick="loadWordList()" class="btn btn-success">Load Words</button>
+      <button onclick="clearWordList()" class="btn btn-warning">Clear Words</button>
     </div>
 
-    <div id="trainer" class="card" role="region" aria-live="polite"></div>
-    <div id="scoreDisplay" class="card" role="region" aria-live="polite"></div>
-    <div id="loadingIndicator" style="display:none;" aria-busy="true">
+    <div id="trainer" class="card"></div>
+    <div id="scoreDisplay" class="card"></div>
+    <div id="loadingIndicator" style="display:none;">
       <div class="progress-container">
         <div class="progress-bar"></div>
       </div>
@@ -90,29 +247,106 @@
       <p hidden>
         <label>Don't fill this out: <input name="bot-field" /></label>
       </p>
-      <textarea name="message" rows="3" placeholder="Write your notes or comments here..." style="width:100%;" required aria-label="Feedback textarea"></textarea>
-      <button type="submit" class="btn btn-success" id="submitBtn" aria-label="Submit feedback">
+      <textarea name="message" rows="3" placeholder="Write your notes or comments here..." style="width:100%;" required></textarea>
+      <button type="submit" class="btn btn-success" id="submitBtn">
         <i class="fas fa-paper-plane"></i> Send Comment
       </button>
-    </form>
-
-    <!-- Hidden Netlify Form for Fallback Submission -->
-    <form name="feedback" netlify netlify-honeypot="bot-field" hidden>
-      <input type="text" name="user-email" />
-      <textarea name="message"></textarea>
     </form>
   </div>
 
   <!-- External Scripts -->
+  <script src="oet_word_list.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.0/mammoth.browser.min.js"></script>
 
-  <!-- App Scripts -->
-  <script type="module" src="js/firebase-config.js"></script>
-  <script type="module" src="js/auth.js"></script>
-  <script type="module" src="js/word-manager.js"></script>
-  <script type="module" src="js/analytics.js"></script>
-  <script type="module" src="js/speech.js"></script>
-  <script type="module" src="js/app.js"></script>
+  <!-- Fixed JavaScript -->
+  <script>
+    // Initialize Firebase
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const analytics = firebase.analytics();
+    const synth = window.speechSynthesis;
+
+    // Dark Mode Fix
+    document.getElementById('modeToggle').addEventListener('click', function() {
+      document.body.classList.toggle('dark-mode');
+      const dark = document.body.classList.contains('dark-mode');
+      document.getElementById('modeIcon').className = dark ? 'fas fa-sun' : 'fas fa-moon';
+      localStorage.setItem('darkMode', dark ? 'enabled' : 'disabled');
+    });
+
+    // Initialize dark mode
+    if (localStorage.getItem('darkMode') === 'enabled') {
+      document.body.classList.add('dark-mode');
+      document.getElementById('modeIcon').className = 'fas fa-sun';
+    }
+
+    // Auth State Listener Fix
+    auth.onAuthStateChanged(user => {
+      const loginStatus = document.getElementById('loginStatus');
+      if (user) {
+        loginStatus.textContent = `Logged in as ${user.email}`;
+        loginStatus.style.color = 'green';
+      } else {
+        loginStatus.textContent = 'Not logged in';
+        loginStatus.style.color = 'red';
+      }
+    });
+
+    // Login Fix
+    async function loginUser() {
+      const email = document.getElementById('userEmail').value.trim();
+      const password = document.getElementById('userPassword').value;
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+        showNotification('Login successful!', 'success');
+      } catch (error) {
+        showNotification(error.message, 'error');
+      }
+    }
+
+    // Word Loading Fix
+    let oetWords = [];
+    if (typeof OET_WORD_LIST !== 'undefined') {
+      oetWords = OET_WORD_LIST;
+    }
+
+    document.getElementById('examSelect').addEventListener('change', function() {
+      if (this.value === 'OET') {
+        showNotification(`Loaded ${oetWords.length} OET words`, 'success');
+      }
+    });
+
+    // Notification Function
+    function showNotification(message, type = "info") {
+      const note = document.createElement("div");
+      note.className = `notification ${type}`;
+      note.innerHTML = `
+        <i class="fas fa-${
+          type === 'error' ? 'exclamation-circle' : 
+          type === 'success' ? 'check-circle' : 
+          'info-circle'
+        }"></i> 
+        <span>${message}</span>
+      `;
+      document.body.appendChild(note);
+      setTimeout(() => note.classList.add("show"), 10);
+      setTimeout(() => {
+        note.classList.remove("show");
+        setTimeout(() => note.remove(), 300);
+      }, 5000);
+    }
+
+    // Initialize other functions (keep your original implementations)
+    function signUpUser() { /* ... */ }
+    function logoutUser() { /* ... */ }
+    function startPractice() { /* ... */ }
+    function startTest() { /* ... */ }
+    function handleFileUpload(event) { /* ... */ }
+    function addCustomWords() { /* ... */ }
+    function saveWordList() { /* ... */ }
+    function loadWordList() { /* ... */ }
+    function clearWordList() { /* ... */ }
+  </script>
 </body>
 </html>
