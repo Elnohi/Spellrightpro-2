@@ -1,1 +1,0 @@
-# Spellrightpro-2
