@@ -1,6 +1,7 @@
+// js/main-freemium-oet.js
 import { showLoader, hideLoader, toggleFlagWord, isWordFlagged, getFlaggedWords, handlePracticeFlaggedWords, showAlert } from './common.js';
 
-// Add "Practice Flagged Words" button event
+// ...rest of your code...
 document.getElementById('practice-flagged-btn').onclick = () => {
   handlePracticeFlaggedWords((flaggedList) => {
     words = flaggedList.slice();
@@ -9,7 +10,7 @@ document.getElementById('practice-flagged-btn').onclick = () => {
   });
 };
 
-// Replace flag button rendering and logic:
+// Wherever you render flag buttons in UI:
 function renderFlagBtn(word) {
   const flagged = isWordFlagged(word);
   return `
@@ -19,14 +20,6 @@ function renderFlagBtn(word) {
   `;
 }
 
-// When toggling flag in your logic, call:
-toggleFlagWord(word);
-// Then call renderFlagBtn(word) to re-render the button
+// Use showLoader/hideLoader for async, and showAlert for all messages
 
-// Add showLoader()/hideLoader() for async ops (file upload, speech init, etc)
-
-// Remove all dark mode logic from here; handled in common.js
-
-// Use showAlert as provided in common.js for messages
-
-// ...rest of your app logic...
+// Remove all dark mode code here—handled in common.js now.
