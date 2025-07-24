@@ -1,9 +1,26 @@
-// main-premium.js
+// js/main-premium.js
 import { showLoader, hideLoader, toggleFlagWord, isWordFlagged, getFlaggedWords, handlePracticeFlaggedWords, showAlert } from './common.js';
 
-// ... all your imports and variables as before
+let currentUser = null;
+let examType = "OET";
+let accent = "en-US";
+let words = [];
+let currentIndex = 0;
+let sessionMode = "practice";
+let score = 0;
+let flaggedWords = [];
+let userAnswers = [];
+let userAttempts = [];
 
-// Inside renderAuth() (add "Forgot password?" link)
+const authArea = document.getElementById('auth-area');
+const premiumApp = document.getElementById('premium-app');
+const examUI = document.getElementById('exam-ui');
+const trainerArea = document.getElementById('trainer-area');
+const summaryArea = document.getElementById('summary-area');
+const appTitle = document.getElementById('app-title');
+
+const WORD_SEPARATORS = /[\s,;\/\-–—|]+/;
+
 function renderAuth() {
   if (currentUser) {
     authArea.innerHTML = `
@@ -64,7 +81,12 @@ function renderAuth() {
   }
 }
 
-// ---- For all word/practice/trainer areas, flagging: ----
+auth.onAuthStateChanged(user => {
+  currentUser = user;
+  renderAuth();
+});
+
+// ... Rest of your main-premium.js logic, update all flag buttons as:
 function renderFlagBtn(word) {
   const flagged = isWordFlagged(word);
   return `
@@ -73,22 +95,12 @@ function renderFlagBtn(word) {
     </button>
   `;
 }
-// In all your practice/test/trainer UI, replace flag/star button rendering with renderFlagBtn(word)
-// And in logic: when toggling, call toggleFlagWord(word) and re-render the word UI
 
-// ---- Loader usage example ----
-// Whenever a long async starts (TTS, recognition, file upload, login, etc), call showLoader(); then hideLoader() at end
-
-// ---- Practice Flagged Words ----
+// At the end, wire up the Practice Flagged Words button:
 document.getElementById('practice-flagged-btn').onclick = () => {
   handlePracticeFlaggedWords((flaggedList) => {
     words = flaggedList.slice();
     currentIndex = 0;
-    // For OET: startOET(); for Bee: startBee(); or for Custom: startCustomPractice();
-    startOET(); // or whichever is appropriate
+    startOET(); // Or your actual practice mode for flagged words
   });
 };
-
-// ---- In all summary areas, add a similar button (HTML & logic as above) ----
-
-// Remove ALL duplicate dark mode toggle code from this file. Only use common.js.
