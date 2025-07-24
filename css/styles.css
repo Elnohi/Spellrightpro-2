@@ -569,4 +569,19 @@ textarea {
   .summary-actions {
     flex-direction: column;
   }
+
+  .loader-spinner {
+  border: 8px solid #eee;
+  border-top: 8px solid #4361ee;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg);}
+  100% { transform: rotate(360deg);}
+}
+#loader-overlay { display: flex !important; }
+
 }
