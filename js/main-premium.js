@@ -15,7 +15,6 @@ let sessionMode = "practice";
 let score = 0;
 let userAnswers = [];
 let userAttempts = [];
-
 const authArea = document.getElementById('auth-area');
 const premiumApp = document.getElementById('premium-app');
 const examUI = document.getElementById('exam-ui');
@@ -23,13 +22,12 @@ const trainerArea = document.getElementById('trainer-area');
 const summaryArea = document.getElementById('summary-area');
 const appTitle = document.getElementById('app-title');
 
-// Firebase Auth integration
+// ---------- AUTH ----------
 auth.onAuthStateChanged(user => {
   currentUser = user;
   renderAuth();
 });
 
-// AUTH UI & LOGIC
 function renderAuth() {
   if (currentUser) {
     authArea.innerHTML = `
@@ -90,7 +88,7 @@ function renderAuth() {
   }
 }
 
-// Exam UI render (mode selection, accent, exam type, start)
+// ---------- EXAM UI ----------
 function renderExamUI() {
   examUI.innerHTML = `
     <div class="mode-selector">
@@ -143,13 +141,9 @@ function renderExamUI() {
   };
   document.getElementById('start-btn').onclick = () => {
     summaryArea.innerHTML = "";
-    if (examType === "OET") {
-      startOET();
-    } else if (examType === "Bee") {
-      startBee();
-    } else if (examType === "Custom") {
-      renderCustomInput();
-    }
+    if (examType === "OET") startOET();
+    else if (examType === "Bee") startBee();
+    else if (examType === "Custom") renderCustomInput();
   };
 
   if (examType === "Custom") renderCustomInput();
@@ -164,6 +158,7 @@ function updateFlagSVG() {
   document.getElementById('flag-svg').innerHTML = flagSVGs[accent] || "";
 }
 
+// CUSTOM MODE
 function renderCustomInput() {
   document.getElementById('custom-upload-area').innerHTML = `
     <textarea id="custom-words" class="form-control" rows="4"
@@ -189,20 +184,53 @@ function renderCustomInput() {
   };
 }
 
-// ---------------- OET SPELLING MODE ----------------
+// ---------- OET SPELLING ----------
 function startOET() {
   currentIndex = 0; score = 0; userAnswers = [];
   words = window.oetWords ? window.oetWords.slice() : [];
   if (sessionMode === "test") words = shuffleArray([...words]).slice(0, 24);
   appTitle.textContent = `OET Spelling ${sessionMode === "test" ? "Test" : "Practice"}`;
-  showOETWord();
-  speakCurrentWord();
+  showWord(trainerOETLogic, words);
 }
-function showOETWord() {
-  if (currentIndex >= words.length) return showSummary();
-  const word = words[currentIndex];
+
+// ---------- SPELLING BEE ----------
+function startBee() {
+  currentIndex = 0; score = 0; userAttempts = [];
+  words = [
+    "accommodate", "belligerent", "conscientious", "disastrous", 
+    "embarrass", "foreign", "guarantee", "harass", 
+    "interrupt", "jealous", "knowledge", "liaison",
+    "millennium", "necessary", "occasionally", "possession",
+    "questionnaire", "rhythm", "separate", "tomorrow",
+    "unforeseen", "vacuum", "withhold", "yacht"
+  ];
+  appTitle.textContent = "Spelling Bee";
+  showWord(trainerBeeLogic, words);
+}
+
+// ---------- CUSTOM SPELLING ----------
+function startCustomPractice() {
+  currentIndex = 0; score = 0; userAnswers = [];
+  showWord(trainerOETLogic, words, true);
+}
+
+// ---------- TRAINER LOGIC ----------
+function showWord(renderFn, wordList, isCustom) {
+  if (currentIndex >= wordList.length) return showSummary(isCustom ? 'custom' : (examType === "Bee" ? 'bee' : 'oet'));
+  renderFn(wordList, isCustom);
+}
+
+function renderFlagBtn(word) {
+  const flagged = isWordFlagged(word);
+  return `<button id="flag-btn" class="btn btn-flag${flagged ? ' active' : ''}">
+    <i class="${flagged ? 'fas' : 'far'} fa-flag"></i> ${flagged ? "Flagged" : "Flag Word"}
+  </button>`;
+}
+
+function trainerOETLogic(wordList, isCustom) {
+  const word = wordList[currentIndex];
   trainerArea.innerHTML = `
-    <div class="word-progress">Word ${currentIndex + 1} of ${words.length}</div>
+    <div class="word-progress">Word ${currentIndex + 1} of ${wordList.length}</div>
     <div class="word-audio-feedback">
       <button id="repeat-btn" class="btn btn-icon" title="Repeat word">
         <i class="fas fa-redo"></i>
@@ -216,7 +244,7 @@ function showOETWord() {
         <i class="fas fa-arrow-left"></i> Previous
       </button>
       ${renderFlagBtn(word)}
-      <button id="next-btn" class="btn btn-secondary"${currentIndex === words.length-1 ? " disabled" : ""}>
+      <button id="next-btn" class="btn btn-secondary"${currentIndex === wordList.length-1 ? " disabled" : ""}>
         <i class="fas fa-arrow-right"></i> Next
       </button>
     </div>
@@ -224,22 +252,18 @@ function showOETWord() {
   `;
   const userInput = document.getElementById('user-input');
   userInput.focus();
-  document.getElementById('repeat-btn').onclick = () => speakCurrentWord();
-  document.getElementById('prev-btn').onclick = prevOETWord;
-  document.getElementById('next-btn').onclick = nextOETWord;
+  document.getElementById('repeat-btn').onclick = () => speakWord(word);
+  document.getElementById('prev-btn').onclick = () => { if (currentIndex > 0) { currentIndex--; showWord(trainerOETLogic, wordList, isCustom); speakWord(wordList[currentIndex]); } };
+  document.getElementById('next-btn').onclick = () => { if (currentIndex < wordList.length - 1) { currentIndex++; showWord(trainerOETLogic, wordList, isCustom); speakWord(wordList[currentIndex]); } };
   document.getElementById('flag-btn').onclick = () => {
     toggleFlagWord(word);
-    showOETWord(); // re-render button state
+    showWord(trainerOETLogic, wordList, isCustom);
   };
-  userInput.onkeydown = (e) => { if (e.key === 'Enter') checkOETAnswer(word); };
-  userInput.oninput = (e) => {
-    if (e.target.value.toLowerCase() === word.toLowerCase()) checkOETAnswer(word);
-  };
+  userInput.onkeydown = (e) => { if (e.key === 'Enter') checkOETAnswer(word, wordList, isCustom); };
+  userInput.oninput = (e) => { if (e.target.value.toLowerCase() === word.toLowerCase()) checkOETAnswer(word, wordList, isCustom); };
 }
-function speakCurrentWord() {
-  speakWord(words[currentIndex]);
-}
-function checkOETAnswer(correctWord) {
+
+function checkOETAnswer(correctWord, wordList, isCustom) {
   const userInput = document.getElementById('user-input');
   const userAnswer = userInput.value.trim();
   userAnswers[currentIndex] = userAnswer;
@@ -250,8 +274,8 @@ function checkOETAnswer(correctWord) {
     score++;
     document.getElementById('word-status').innerHTML = '<i class="fas fa-check-circle"></i>';
     setTimeout(() => {
-      if (currentIndex < words.length - 1) { currentIndex++; showOETWord(); speakCurrentWord(); }
-      else showSummary();
+      if (currentIndex < wordList.length - 1) { currentIndex++; showWord(trainerOETLogic, wordList, isCustom); speakWord(wordList[currentIndex]); }
+      else showSummary(isCustom ? 'custom' : (examType === "Bee" ? 'bee' : 'oet'));
     }, 1000);
   } else {
     feedback.textContent = `✗ Incorrect. The correct spelling is: ${correctWord}`;
@@ -259,16 +283,62 @@ function checkOETAnswer(correctWord) {
     document.getElementById('word-status').innerHTML = '<i class="fas fa-times-circle"></i>';
   }
 }
-function nextOETWord() {
-  if (currentIndex < words.length - 1) { currentIndex++; showOETWord(); speakCurrentWord(); }
-  else showSummary();
-}
-function prevOETWord() {
-  if (currentIndex > 0) { currentIndex--; showOETWord(); speakCurrentWord(); }
-}
-// ----------------------------------------------------
 
-// Example Spelling Bee and Custom session can be added below, following same structure...
+function trainerBeeLogic(wordList) {
+  const word = wordList[currentIndex];
+  trainerArea.innerHTML = `
+    <div class="word-progress">Word ${currentIndex + 1} of ${wordList.length}</div>
+    <div class="word-audio-feedback">
+      <button id="repeat-btn" class="btn btn-icon" title="Repeat word">
+        <i class="fas fa-redo"></i>
+      </button>
+      <span id="word-status"></span>
+    </div>
+    <input type="text" id="user-input" class="form-control" style="margin-top: 15px;"
+           placeholder="Type the spelling aloud or type here..." autofocus>
+    <div class="button-group">
+      <button id="prev-btn" class="btn btn-secondary"${currentIndex === 0 ? " disabled" : ""}>
+        <i class="fas fa-arrow-left"></i> Previous
+      </button>
+      ${renderFlagBtn(word)}
+      <button id="next-btn" class="btn btn-secondary"${currentIndex === wordList.length-1 ? " disabled" : ""}>
+        <i class="fas fa-arrow-right"></i> Next
+      </button>
+    </div>
+    <div id="feedback" class="feedback" style="margin-top: 15px;"></div>
+  `;
+  const userInput = document.getElementById('user-input');
+  userInput.focus();
+  document.getElementById('repeat-btn').onclick = () => speakWord(word);
+  document.getElementById('prev-btn').onclick = () => { if (currentIndex > 0) { currentIndex--; showWord(trainerBeeLogic, wordList); speakWord(wordList[currentIndex]); } };
+  document.getElementById('next-btn').onclick = () => { if (currentIndex < wordList.length - 1) { currentIndex++; showWord(trainerBeeLogic, wordList); speakWord(wordList[currentIndex]); } };
+  document.getElementById('flag-btn').onclick = () => {
+    toggleFlagWord(word);
+    showWord(trainerBeeLogic, wordList);
+  };
+  userInput.onkeydown = (e) => { if (e.key === 'Enter') checkBeeAnswer(word, wordList); };
+}
+
+function checkBeeAnswer(correctWord, wordList) {
+  const userInput = document.getElementById('user-input');
+  const userAttempt = userInput.value.trim();
+  userAttempts[currentIndex] = userAttempt;
+  const feedback = document.getElementById('feedback');
+  if (userAttempt.toLowerCase() === correctWord.toLowerCase()) {
+    feedback.textContent = "✓ Correct!";
+    feedback.className = "feedback correct";
+    score++;
+    document.getElementById('word-status').innerHTML = '<i class="fas fa-check-circle"></i>';
+    setTimeout(() => {
+      if (currentIndex < wordList.length - 1) { currentIndex++; showWord(trainerBeeLogic, wordList); speakWord(wordList[currentIndex]); }
+      else showSummary('bee');
+    }, 1000);
+  } else {
+    feedback.textContent = `✗ Incorrect. The correct spelling is: ${correctWord}`;
+    feedback.className = "feedback incorrect";
+    document.getElementById('word-status').innerHTML = '<i class="fas fa-times-circle"></i>';
+  }
+}
 
 function speakWord(word) {
   if (!window.speechSynthesis) {
@@ -282,9 +352,19 @@ function speakWord(word) {
   speechSynthesis.speak(utter);
 }
 
-function showSummary() {
-  const percent = Math.round((score / words.length) * 100);
-  const wrongWords = words.filter((w, i) => (userAnswers[i] || "").toLowerCase() !== w.toLowerCase());
+function showSummary(mode) {
+  let correctList = [];
+  let wrongList = [];
+  let percent = 0;
+  if (mode === 'bee') {
+    percent = Math.round((score / words.length) * 100);
+    correctList = words.filter((w, i) => (userAttempts[i] || "").toLowerCase() === w.toLowerCase());
+    wrongList = words.filter((w, i) => (userAttempts[i] || "").toLowerCase() !== w.toLowerCase());
+  } else {
+    percent = Math.round((score / words.length) * 100);
+    correctList = words.filter((w, i) => (userAnswers[i] || "").toLowerCase() === w.toLowerCase());
+    wrongList = words.filter((w, i) => (userAnswers[i] || "").toLowerCase() !== w.toLowerCase());
+  }
   summaryArea.innerHTML = `
     <div class="card-header">
       <h3>Session Results</h3>
@@ -293,17 +373,16 @@ function showSummary() {
     <div class="results-grid">
       <div class="results-card correct">
         <h3><i class="fas fa-check-circle"></i> Correct</h3>
-        <div class="score-number">${score}</div>
+        <div class="score-number">${correctList.length}</div>
         <div class="word-list">
-          ${words.filter((w, i) => (userAnswers[i] || "").toLowerCase() === w.toLowerCase())
-            .map(w => `<div class="word-item">${w}</div>`).join('')}
+          ${correctList.map(w => `<div class="word-item">${w}</div>`).join('')}
         </div>
       </div>
       <div class="results-card incorrect">
         <h3><i class="fas fa-times-circle"></i> Needs Practice</h3>
-        <div class="score-number">${wrongWords.length}</div>
+        <div class="score-number">${wrongList.length}</div>
         <div class="word-list">
-          ${wrongWords.map(w => `<div class="word-item">${w}</div>`).join('')}
+          ${wrongList.map(w => `<div class="word-item">${w}</div>`).join('')}
         </div>
       </div>
     </div>
@@ -319,7 +398,11 @@ function showSummary() {
       <i class="far fa-flag"></i> Practice Flagged Words
     </button>
   `;
-  document.getElementById('restart-btn').onclick = startOET;
+  document.getElementById('restart-btn').onclick = () => {
+    if (mode === 'bee') startBee();
+    else if (mode === 'custom') startCustomPractice();
+    else startOET();
+  };
   document.getElementById('new-list-btn').onclick = () => {
     summaryArea.innerHTML = "";
     renderExamUI();
@@ -328,17 +411,21 @@ function showSummary() {
     handlePracticeFlaggedWords((flaggedList) => {
       words = flaggedList.slice();
       currentIndex = 0;
-      startOET();
+      if (mode === 'bee') startBee();
+      else if (mode === 'custom') startCustomPractice();
+      else startOET();
     });
   };
 }
 
-// Flagged button on main page
+// ----------- Practice Flagged Words button on main page
 document.getElementById('practice-flagged-btn').onclick = () => {
   handlePracticeFlaggedWords((flaggedList) => {
     words = flaggedList.slice();
     currentIndex = 0;
-    startOET();
+    if (examType === "Bee") startBee();
+    else if (examType === "Custom") startCustomPractice();
+    else startOET();
   });
 };
 
