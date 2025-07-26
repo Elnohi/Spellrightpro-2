@@ -1,5 +1,5 @@
-// js/common.js
-// Unified dark mode, loader, and flag logic
+// common.js
+// Unified flag logic, dark mode, and loader overlay
 
 export function initDarkModeToggle() {
   const toggleBtn = document.getElementById('dark-mode-toggle');
@@ -37,7 +37,7 @@ export function hideLoader() {
   if (loader) loader.style.display = 'none';
 }
 
-// Flagging logic - uses only flag icon
+// Flagging logic - uses only flag icon (not star)
 export let flaggedWords = JSON.parse(localStorage.getItem('flaggedWords')) || [];
 
 export function toggleFlagWord(currentWord) {
@@ -60,6 +60,7 @@ export function getFlaggedWords() {
   return JSON.parse(localStorage.getItem('flaggedWords')) || [];
 }
 
+// --- Optional: utility for summary page button ---
 export function handlePracticeFlaggedWords(startPracticeCallback) {
   const flagged = getFlaggedWords();
   if (!flagged.length) {
@@ -80,4 +81,5 @@ export function showAlert(message, type = 'error') {
   }, 3000);
 }
 
+// Init on page load
 document.addEventListener('DOMContentLoaded', initDarkModeToggle);
